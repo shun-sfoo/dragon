@@ -3,10 +3,8 @@
 
 #include <stddef.h>
 
-#define lept_init(v)       \
-  do {                     \
-    (v)->type = LEPT_NULL; \
-  } while (0)
+#define lept_init(v) \
+  do { (v)->type = LEPT_NULL; } while (0)
 
 #define lept_set_null(v) lept_free(v)
 
@@ -20,9 +18,16 @@ typedef enum {
   LEPT_NUMBER
 } lept_type;
 
-typedef struct {
+typedef struct lept_value lept_value;
+
+struct lept_value {
   lept_type type;
   union {
+    struct {
+      lept_value* e;
+      size_t size;
+    } a; /* array */
+
     struct {
       char* s;
       size_t len;
@@ -30,7 +35,7 @@ typedef struct {
 
     double n;
   } u;
-} lept_value;
+};
 
 enum {
   LEPT_PARSE_OK = 0,
@@ -65,7 +70,9 @@ void lept_set_string(lept_value* v, const char* s, size_t len);
 
 void lept_set_null(lept_value* v);
 
-void lept_free(lept_value* v);
+size_t lept_get_array_size(const lept_value* v);
+
+lept_value* lept_get_array_element(const lept_value* v, size_t index);
 
 void lept_free(lept_value* v);
 

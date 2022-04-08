@@ -19,10 +19,8 @@
 #define ISDIGIT(ch) ((ch) >= '0' && (ch) <= '9')
 #define ISDIGIT1TO9(ch) ((ch) >= '1' && (ch) <= '9')
 
-#define PUTC(c, ch)                                    \
-  do {                                                 \
-    *(char*)lept_context_push(c, sizeof(char)) = (ch); \
-  } while (0)
+#define PUTC(c, ch) \
+  do { *(char*)lept_context_push(c, sizeof(char)) = (ch); } while (0)
 
 #define STRING_ERROR(ret) \
   do {                    \
@@ -60,8 +58,7 @@ static void* lept_context_pop(lept_context* c, size_t size) {
 /* ws = *(%x20 / %x09 / %x0A / %x0D) */
 static void lept_parse_whitespace(lept_context* c) {
   const char* p = c->json;
-  while (*p == ' ' || *p == '\t' || *p == '\n' || *p == '\r')
-    p++;
+  while (*p == ' ' || *p == '\t' || *p == '\n' || *p == '\r') p++;
 
   c->json = p;
 }
@@ -300,4 +297,15 @@ void lept_set_string(lept_value* v, const char* s, size_t len) {
   v->u.s.s[len] = '\0';
   v->u.s.len = len;
   v->type = LEPT_STRING;
+}
+
+size_t lept_get_array_size(const lept_value* v) {
+  assert(v != NULL && v->type == LEPT_ARRAY);
+  return v->u.a.size;
+}
+
+lept_value* lept_get_array_element(const lept_value* v, size_t index) {
+  assert(v != NULL && v->type == LEPT_ARRAY);
+  assert(index < v->u.a.size);
+  return &v->u.a.e[index];
 }
